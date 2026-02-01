@@ -1,144 +1,109 @@
-# Oh My Hungry God 🍉🥥🍑🍌
+# HungryGodMask
 
-A synchronous multiplayer AR game where players work together to feed a hungry god by throwing fruits into their mouth!
+An AR game for Global Game Jam 2026 where players throw fruits into an animated mask's mouth displayed on a TV/projector.
 
-## Play the Game
+## Game Concept
 
-**Host Display**: https://ggj2026.borissedov.com
+- **AR Image Tracking**: Track an animated mask displayed on a TV/projector screen
+- **Physics-Based Throwing**: Swipe to throw fruits with realistic physics
+- **Collision Detection**: Score points by hitting the invisible mouth gate
+- **Multiplayer**: Work together with other players to fulfill orders
 
-## Project Repositories
+## Setup Requirements
 
-This game is split across three repositories:
-
-- **[Backend Server](https://github.com/borissedov/GGJ2026-Backend)** - .NET 9 + SignalR authoritative server
-- **[Frontend Display](https://github.com/borissedov/GGJ2026-Frontend)** - TypeScript web app for TV/projector
-- **[iOS AR Controller](https://github.com/borissedov/GGJ2026-iOS)** - Swift + ARKit mobile controllers
-
-## Game Overview
-
-Feed a hungry god by throwing fruits into their mouth displayed on a TV or projector! Work together with other players to fulfill orders before time runs out. But beware - make too many mistakes and the god will burn out in anger!
-
-### How to Play
-
-#### Setup
-1. **Display the game** on a TV or projector at https://ggj2026.borissedov.com
-2. **Players join** by scanning the QR code with their iOS devices
-3. **Point your phone** at the TV screen to enter AR mode
-4. **Mark ready** when you're set to play
-
-#### Gameplay
-- Each round presents an **order** showing which fruits are needed
-- **All players work together** to throw the right fruits
-- Swipe fruits from your phone toward the mask's mouth
-- **10 seconds** to complete each order
-- **10 orders** total per game
-
-#### Winning
-- **Exact match** = Success! The god is pleased
-- **Over-submission** = Instant fail! Too much of a fruit
-- **Timeout** = Fail! Didn't complete in time
-
-Keep the god happy through all 10 orders to win!
-
-## The God's Mood
-
-The god's mood changes based on your performance:
-
-```
-💀 BURNED  ←  😠 ANGRY  ←  😐 NEUTRAL  →  😊 HAPPY
-```
-
-### Mood Rules
-- Start at **NEUTRAL**
-- Every **2 successes** → Mood improves
-- Every **1 failure** → Mood worsens
-- **Mood drops below ANGRY** → God burns out → **GAME OVER**
-
-The god's mood is shown on the TV display with animated video loops.
-
-## Game Rules
-
-### Orders
-- 4 fruit types: Banana 🍌, Peach 🍑, Coconut 🥥, Watermelon 🍉
-- Each order requires 0-5 of each fruit type
-- At least one fruit type is always required
-- All players contribute to the same shared goal
-
-### Resolution (Immediate Rules)
-- **Over-submit** any fruit → **Instant fail**
-  - Example: Order wants 2 bananas, you throw 3 → Fail immediately
-- **Exact match** all fruits → **Instant success**
-  - No need to wait for timer
-- **Timer expires** without exact match → **Fail (timeout)**
-
-### Collaboration
-- All players throw fruits into the same pool
-- Communication is key!
-- One player over-throwing ruins it for everyone
-- Work together to match orders exactly
-
-## Components
-
-### Host Display (Web)
-- Shows QR code for joining
-- Displays current order and requirements
-- Shows real-time progress (fruit counts)
-- Displays god's mood with video background
-- Shows final results
-
-### iOS AR Controller
-- Scans QR code to join
-- Shows current order overlay in AR
-- Throw fruits by swiping
-- See fruits in augmented reality
-
-### Backend Server
-- Validates all actions
-- Tracks game state
-- Calculates mood
-- Ensures fair play (authoritative)
-
-## Technical Requirements
-
-### For Players (iOS)
-- iPhone 6s or later with ARKit support
-- iOS 15.0 or later
+### Hardware
+- iOS device with ARKit support (iPhone 6s or later)
+- TV, projector, or large screen (for the Host Display)
 - Internet connection
 
-### For Host (Display)
-- Modern web browser (Chrome, Safari, Edge)
-- TV, projector, or large screen
-- Internet connection
+### Software
+- Xcode 14.0+
+- iOS 15.0+
 
-## Game Session
+## Multiplayer Setup
 
-- **Room-based**: Each game creates a unique room
-- **No authentication**: Anonymous play with QR codes
-- **Temporary**: Rooms expire after inactivity
-- **2-6 players recommended**: Works with any number but best with small groups
+This app is designed to work with the **Oh My Hungry God** multiplayer system.
 
-## Tips for Success
+1.  **Host Display**: Runs on a web browser (TV/Projector).
+2.  **Backend**: .NET 9 server managing game state.
+3.  **iOS Client**: This app, connecting via SignalR.
 
-1. **Communicate**: Talk about who's throwing what
-2. **Count together**: Track how many fruits have been thrown
-3. **Don't over-throw**: One extra fruit = instant fail
-4. **Watch the timer**: 10 seconds goes fast!
-5. **Stay calm**: Panic leads to mistakes
+See **[MULTIPLAYER_SETUP.md](MULTIPLAYER_SETUP.md)** for detailed deployment and connection instructions.
 
-## About
+## Project Structure
 
-Created for **Global Game Jam 2026** in Mauritius at **Institut Français de Maurice**.
+```
+HungryGodMask/
+├── AppDelegate.swift
+├── ContentView.swift           # Main entry view
+├── Views/
+│   ├── ARImageTrackingView.swift # AR view & session management
+│   ├── WelcomeView.swift       # Initial landing screen
+│   ├── VideoSplashView.swift   # Intro video
+│   ├── QRScannerView.swift     # Scanner for joining rooms
+│   ├── PlayerNameView.swift    # Name entry
+│   └── Multiplayer/
+│       ├── LobbyView.swift     # Waiting room UI
+│       └── OrderOverlayView.swift # In-game order UI
+├── Networking/
+│   ├── SignalRClient.swift     # WebSocket connection manager
+│   └── Events/                 # Network event models
+├── Entities/
+│   ├── FruitType.swift         # Enum with physics properties
+│   ├── FruitEntity.swift       # 2D sprite with physics
+│   └── MouthGateEntity.swift   # Invisible collision gate
+├── Systems/
+│   ├── GameManager.swift       # Game logic & state management
+│   ├── FruitSpawner.swift      # Fruit lifecycle management
+│   └── ThrowGestureHandler.swift # Gesture → physics
+└── Assets.xcassets/
+    ├── AR Resources.arresourcegroup/
+    └── [Fruit sprites]
+```
 
-- **Jam Site**: https://globalgamejam.org/jam-sites/2026/ggj2026-mauritius-institut-francais-de-maurice
-- **Global Game Jam**: https://globalgamejam.org
+## Building and Running
 
-### Technologies
-- ARKit (Apple)
-- RealityKit (Physics & 3D)
-- .NET 9 (Backend)
-- SignalR (Real-time communication)
-- TypeScript (Frontend)
+1.  Open `HungryGodMask.xcodeproj` in Xcode.
+2.  Ensure you have the SignalR Swift package added (see `MULTIPLAYER_SETUP.md`).
+3.  Connect your iOS device.
+4.  Select your device as the build target.
+5.  Build and Run (⌘R).
 
----
+## Playing the Game
 
-**Ready to play?** Visit https://ggj2026.borissedov.com and feed the hungry god! 🍉🥥🍑🍌
+1.  **Join a Room**: Scan the QR code on the Host Display or enter the code manually.
+2.  **Lobby**: Wait for other players and tap "Ready".
+3.  **AR Mode**: When the game starts, point your camera at the TV screen showing the mask.
+4.  **Throw**: Swipe on the fruits at the bottom of your screen to throw them into the mask's mouth.
+5.  **Collaborate**: Work with your team to fulfill the orders displayed on the screen!
+
+## Customization
+
+### Adjust Mouth Gate Position
+Edit `Entities/MouthGateEntity.swift`:
+```swift
+static let defaultMouthOffset = SIMD3<Float>(0, -0.05, 0)  // X, Y, Z in meters
+```
+
+### Adjust Fruit Physics
+Edit values in `Entities/FruitType.swift`:
+- `size`: Physical dimensions
+- `mass`: Weight for throw physics
+
+### Tune Throwing Feel
+Edit `Systems/ThrowGestureHandler.swift`:
+```swift
+private let velocityMultiplier: Float = 0.003
+private let maxThrowVelocity: Float = 10.0
+```
+
+## Documentation
+
+- **[MULTIPLAYER_README.md](MULTIPLAYER_README.md)** - Overview of the multiplayer architecture
+- **[MULTIPLAYER_SETUP.md](MULTIPLAYER_SETUP.md)** - Detailed setup guide
+- **[ARCHITECTURE.md](ARCHITECTURE.md)** - High-level architectural overview
+- **[GAME_DESCRIPTION.md](GAME_DESCRIPTION.md)** - Game design document
+
+## Credits
+
+Created for Global Game Jam 2026
