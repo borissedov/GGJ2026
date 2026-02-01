@@ -6,6 +6,8 @@ A synchronous multiplayer AR game where players work together to feed a hungry g
 
 **Host Display**: https://ggj2026.borissedov.com
 
+**GGJ Game Page**: https://globalgamejam.org/games/2026/oh-my-hungry-god-5
+
 ## Project Components
 
 This project consists of three main components:
@@ -42,19 +44,20 @@ Keep the god happy through all 10 orders to win!
 
 ## The God's Mood
 
-The god's mood changes based on your performance:
+The god's mood changes based on your performance and affects your team rating:
 
 ```
-💀 BURNED  ←  😠 ANGRY  ←  😐 NEUTRAL  →  😊 HAPPY
+😠 ANGRY  ←  😐 NEUTRAL  →  😊 HAPPY
 ```
 
 ### Mood Rules
 - Start at **NEUTRAL**
 - Every **2 successes** → Mood improves
 - Every **1 failure** → Mood worsens
-- **Mood drops below ANGRY** → God burns out → **GAME OVER**
+- The game always continues for all 10 orders
+- Your final mood determines your team stars (1-3)
 
-The god's mood is shown on the TV display with animated video loops.
+The god's mood is shown on the TV display with animated video loops and mood transitions.
 
 ## Game Rules
 
@@ -80,17 +83,24 @@ The god's mood is shown on the TV display with animated video loops.
 ## Components
 
 ### Host Display (Web)
-- Shows QR code for joining
-- Displays current order and requirements
-- Shows real-time progress (fruit counts)
-- Displays god's mood with video background
-- Shows final results
+- Shows QR code for joining with game logo
+- 6-second countdown before game starts
+- Circular arc timer for each order
+- Displays current order with particle effects on hits
+- Real-time progress with emoji highlights
+- Dynamic mood video backgrounds with transitions
+- Results screen with team stars, per-player stats, and restart button
 
 ### iOS AR Controller
-- Scans QR code to join
+- Scans QR code to join with player name
+- How To Play guide on welcome screen
+- Share host URL for easy TV/projector setup
+- Randomized fruit panel for each order
+- Sound effects for touch, throw, hit, and miss
+- Screen frame overlay with decorative border
 - Shows current order overlay in AR
 - Throw fruits by swiping
-- See fruits in augmented reality
+- Restart option when game ends
 
 ### Backend Server
 - Validates all actions
@@ -125,10 +135,17 @@ The god's mood is shown on the TV display with animated video loops.
 4. **Watch the timer**: 10 seconds goes fast!
 5. **Stay calm**: Panic leads to mistakes
 
+## Documentation
+
+- **[ARCHITECTURE.md](ARCHITECTURE.md)** - System architecture and technical details
+- **[MULTIPLAYER_README.md](MULTIPLAYER_README.md)** - Multiplayer implementation overview
+- **[GAME_DESCRIPTION.md](GAME_DESCRIPTION.md)** - Complete game design document
+
 ## About
 
 Created for **Global Game Jam 2026** in Mauritius at **Institut Français de Maurice**.
 
+- **Game Page**: https://globalgamejam.org/games/2026/oh-my-hungry-god-5
 - **Jam Site**: https://globalgamejam.org/jam-sites/2026/ggj2026-mauritius-institut-francais-de-maurice
 - **Global Game Jam**: https://globalgamejam.org
 

@@ -61,20 +61,20 @@ Central communication hub for all clients.
 
 **Client → Server Methods:**
 - `CreateRoom()` - Display creates a new game room
-- `JoinRoom(joinCode)` - Player joins with 6-character code
+- `JoinRoom(joinCode, playerName)` - Player joins with 6-character code and name
 - `SetReady(roomId, ready)` - Player marks ready/not ready
-- `ReportHit(roomId, hitId, fruitType)` - Player hit the mouth
+- `ReportHit(roomId, hitId, fruitType)` - Player hit the mouth (tracks per-player stats)
 - `Ping(roomId)` - Keep-alive heartbeat
 
 **Server → Client Events:**
-- `RoomStateUpdated` - Player joins/leaves/ready changes
-- `CountdownStarted` - 10s countdown begins
+- `RoomStateUpdated` - Player joins/leaves/ready changes (includes names)
+- `CountdownStarted` - 6s countdown begins
 - `GameStarted` - Game has started
 - `OrderStarted` - New order with requirements
-- `OrderTotalsUpdated` - Hit counted (live updates)
+- `OrderTotalsUpdated` - Hit counted (live updates, triggers particle effects)
 - `OrderResolved` - Order success/fail
-- `MoodChanged` - God's mood changed
-- `GameFinished` - All 10 orders complete
+- `MoodChanged` - God's mood changed (triggers transitions)
+- `GameFinished` - All 10 orders complete (includes player stats)
 - `StateSnapshot` - Full state sync (on join/reconnect)
 
 #### Game Engine Service
@@ -89,10 +89,10 @@ Authoritative game logic and state machine.
 - Event broadcasting
 
 **Key Methods:**
-- `StartCountdown()` - Begin 10s countdown when all ready
-- `ProcessHit()` - Validate and count fruit hits
-- `ResolveOrder()` - Determine success/fail, update mood
-- `EndGame()` - Transition to results or game over
+- `StartCountdown()` - Begin 6s countdown when all ready
+- `ProcessHit(playerId)` - Validate and count fruit hits, track per-player
+- `ResolveOrder()` - Determine success/fail, update mood (no burnout game over)
+- `EndGame()` - Transition to results with player statistics
 
 #### Room Service
 
@@ -114,7 +114,7 @@ Room lifecycle management.
 Hosted background service for server-side timers.
 
 **Tasks (runs every 1 second):**
-- Check countdown timers (10s)
+- Check countdown timers (6s)
 - Check order timeouts (10s)  
 - Clean up inactive rooms
 
@@ -132,38 +132,48 @@ Manages WebSocket connection and event handling.
 #### Screen Components
 
 **WelcomeScreen:**
+- Displays large logo
 - Generates QR code with join link
 - Displays 6-character join code
+- About link to Global Game Jam
 - Shown during Welcome state
 
 **LobbyScreen:**
-- Lists connected players
+- Lists connected players by name
 - Shows ready status for each
 - Displays "Starting soon..." when all ready
 
+**CountdownScreen:**
+- 6-second countdown animation
+- Dark overlay for better contrast
+
 **GameScreen:**
 - Current order display with fruit requirements
-- Live fruit count updates (submitted/required)
-- Timer countdown
+- Circular arc countdown timer (SVG-based)
+- Live fruit count updates with emoji highlights
+- Particle splash effects on hits
 - Progress bar (orders 1-10)
 - God mood indicator
 
 **ResultsScreen:**
-- Final stats (successes, failures, success rate)
-- Final god mood
-- Burnout message if applicable
+- Plays mood-based ending video once (victory/neutral/angry/defeat)
+- Team stars (0-3) based on final mood
+- Final stats (orders completed, successes, failures, success rate)
+- Per-player statistics table (name, hits, contribution %)
+- Restart button
 
 #### Mood Video Manager
 
-Controls background video based on god's mood.
+Controls background video based on god's mood with smooth transitions.
 
 **Videos:**
-- `neutral.mp4` - Default mood
-- `happy.mp4` - God is pleased
-- `angry.mp4` - God is upset
-- `burned.mp4` - Game over
+- **Moods**: `neutral.webm`, `happy.webm`, `angry.webm` (looping)
+- **Chewing**: Mood-specific eating animations (play on hits)
+- **Transitions**: Smooth crossfades between moods
+- **Endings**: `victory.webm`, `neutral_ending.webm`, `angry_ending.webm`, `defeat.webm`
+- **Lobby**: `waiting.webm` for pre-game
 
-Automatically switches videos when MoodChanged event received.
+Automatically switches videos when MoodChanged event received, plays chewing on OrderTotalsUpdated.
 
 ### 3. iOS App (Swift)
 
@@ -192,8 +202,14 @@ Swift wrapper for SignalRClient-Swift library.
 
 **FruitSpawner:**
 - Spawns one entity per fruit type
+- Randomizes fruit order for each new order
 - Updates positions to follow camera (panel at bottom)
-- Handles respawning after throw
+- Handles respawning after throw (plays miss sound)
+
+**SoundManager:**
+- Loads and plays sound effects
+- Touch, throw, hit, and miss sounds
+- Uses AVAudioPlayer for playback
 
 **ThrowGestureHandler:**
 - Converts swipe gesture to 3D velocity
@@ -201,11 +217,23 @@ Swift wrapper for SignalRClient-Swift library.
 
 #### Multiplayer UI
 
+**WelcomeView:**
+- How To Play expandable guide
+- Share button for host URL
+- About button for GGJ info
+
+**AboutView:**
+- Game information
+- GGJ 2026 Mauritius credits
+- Technology stack
+- Link to jam site
+
 **LobbyView:**
 - Join code input with QR scanner button
+- Player name submission
 - Ready toggle
 - Connection status indicator
-- Transitions to AR game when ready
+- Transitions to AR game when countdown starts
 
 **OrderOverlayView:**
 - Shows current order in AR view
@@ -223,8 +251,14 @@ Coordinates AR gameplay and network integration.
 
 **Collision Detection:**
 - Listens for fruit-gate collisions
-- In multiplayer: sends `ReportHit` to server
+- In multiplayer: sends `ReportHit` to server with player ID
 - In single-player: increments local counters
+- Plays hit sound on successful collision
+
+**Game Over Handling:**
+- Displays game results overlay
+- Shows restart button
+- Resets state for new game
 
 ## Data Flow
 
@@ -296,6 +330,7 @@ sequenceDiagram
 - `ConcurrentDictionary<Guid, Room>` - All active rooms
 - `ConcurrentDictionary<string, Guid>` - Join code → Room ID
 - `ConcurrentDictionary<Guid, HashSet<Guid>>` - Processed hit IDs
+- Player names and hit counts tracked in Player model
 
 **Thread Safety:**
 - All dictionaries use concurrent collections
@@ -307,10 +342,11 @@ sequenceDiagram
 **GameState class:**
 - Current screen
 - Room ID and join code
-- Player list
+- Player list with names
 - Current order
 - Submitted counts
 - Timer
+- Player statistics array
 
 **Reactive:**
 - State changes trigger UI re-renders
@@ -402,6 +438,8 @@ graph LR
 - Hit reporting: < 100ms (player → server → display)
 - State updates: < 50ms broadcast
 - Order resolution: Immediate (no artificial delay)
+- Sound effects: < 10ms local playback
+- Particle effects: 60fps CSS animations
 
 ### Capacity (B1 Azure tier)
 - Concurrent rooms: 20-30
@@ -412,6 +450,8 @@ graph LR
 - Per player: ~1-5 KB/s (mostly keepalives)
 - Per order: ~5-10 KB (order data + updates)
 - Total per game: < 1 MB per player
+- Sound effects: ~200 KB total (preloaded)
+- Logo images: ~100 KB (cached)
 
 ## Fault Tolerance
 

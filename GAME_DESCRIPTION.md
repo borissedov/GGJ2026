@@ -30,19 +30,23 @@ Keep the god happy through all 10 orders to win!
 
 ## The God's Mood
 
-The god's mood changes based on your performance:
+The god's mood changes based on your performance and affects your final rating:
 
 ```
-💀 BURNED  ←  😠 ANGRY  ←  😐 NEUTRAL  →  😊 HAPPY
+😠 ANGRY  ←  😐 NEUTRAL  →  😊 HAPPY
 ```
 
 ### Mood Rules
 - Start at **NEUTRAL**
 - Every **2 successes** → Mood improves
 - Every **1 failure** → Mood worsens
-- **Mood drops below ANGRY** → God burns out → **GAME OVER**
+- The game always continues for all 10 orders
+- Your final mood determines your team stars:
+  - **Happy** = ⭐⭐⭐ (3 stars)
+  - **Neutral** = ⭐⭐☆ (2 stars)
+  - **Angry** = ⭐☆☆ (1 star)
 
-The god's mood is shown on the TV display with animated video loops.
+The god's mood is shown on the TV display with animated video loops, smooth transitions, and chewing animations.
 
 ## Game Rules
 

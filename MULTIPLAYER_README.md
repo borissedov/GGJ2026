@@ -25,21 +25,19 @@ The project is split across multiple repositories:
 ```mermaid
 graph LR
     Welcome[Welcome Screen] --> Lobby[Lobby]
-    Lobby --> Countdown[Countdown 10s]
-    Countdown --> Game[In Game]
+    Lobby --> Countdown[Countdown 6s]
+    Countdown --> Game[In Game - 10 Orders]
     Game --> Results[Results]
-    
-    Game -->|Burnout| GameOver[Game Over]
-    GameOver --> Results
+    Results -->|Restart| Welcome
 ```
 
 ### State Machine
 
-1. **WELCOME**: Display shows QR code, waiting for first player
-2. **LOBBY**: Players join, mark ready
-3. **COUNTDOWN**: All ready → 10 second countdown
-4. **IN_GAME**: Play 10 orders, each 10 seconds
-5. **RESULTS**: Show final stats
+1. **WELCOME**: Display shows logo, QR code, waiting for first player
+2. **LOBBY**: Players join with names, mark ready
+3. **COUNTDOWN**: All ready → 6 second countdown
+4. **IN_GAME**: Always plays all 10 orders, each 10 seconds
+5. **RESULTS**: Show team stars, per-player stats, with restart option
 
 ### Order Resolution (Immediate Rules)
 
@@ -52,7 +50,11 @@ graph LR
 - Start: NEUTRAL (😐)
 - +1 mood every 2 successes → HAPPY (😊)
 - -1 mood per failure → ANGRY (😠)
-- Below ANGRY → BURNED (💀) → Game Over
+- Game always completes all 10 orders
+- Final mood determines team stars:
+  - Happy = ⭐⭐⭐ (3 stars)
+  - Neutral = ⭐⭐☆ (2 stars)
+  - Angry = ⭐☆☆ (1 star)
 
 ## 📡 API Reference
 
@@ -77,7 +79,7 @@ graph LR
 | `OrderTotalsUpdated` | Display | Hit counted (not resolved) |
 | `OrderResolved` | Both | Order success/fail |
 | `MoodChanged` | Display | Mood changes |
-| `GameFinished` | Both | 10 orders complete |
+| `GameFinished` | Both | 10 orders complete (includes player stats) |
 | `StateSnapshot` | Mobile | On join/reconnect |
 
 ## 🔑 Key Features
@@ -87,39 +89,52 @@ graph LR
 - ✅ SignalR for real-time WebSocket communication
 - ✅ In-memory state (ConcurrentDictionary for thread-safety)
 - ✅ Idempotent hit processing (prevents duplicates)
+- ✅ Per-player statistics tracking (hit counts and percentages)
+- ✅ Player name support throughout all events
 - ✅ Background timers for countdown/order timeouts
 - ✅ Automatic room cleanup
+- ✅ 6-second countdown before game starts
 
 ### Frontend
+- ✅ Logo branding on loading and welcome screens
+- ✅ About link to Global Game Jam
 - ✅ QR code generation for easy joining
-- ✅ Real-time lobby with player ready states
-- ✅ Live order display with fruit requirements
-- ✅ Mood video background system
-- ✅ Results screen with stats
+- ✅ Real-time lobby with player names and ready states
+- ✅ 6-second countdown with improved contrast
+- ✅ Circular arc timer for visual countdown
+- ✅ Particle splash effects on fruit hits
+- ✅ Emoji highlight animations
+- ✅ Mood video background system with smooth transitions
+- ✅ Results screen with:
+  - Team stars (0-3) based on final mood
+  - Per-player statistics table
+  - Restart button
+- ✅ Mood-based ending videos (victory, defeat, neutral, angry)
 
 ### iOS
-- ✅ SignalR client integration
-- ✅ Lobby UI with join code input
+- ✅ SignalR client integration with player names
+- ✅ Welcome screen with How To Play guide
+- ✅ Share button for host URL
+- ✅ About screen with GGJ information
+- ✅ Lobby UI with player name display
 - ✅ Order overlay in AR view
+- ✅ Sound effects (touch, throw, hit, miss)
+- ✅ Randomized fruit panel for each order
+- ✅ Screen frame overlay with decorative border
 - ✅ Hit reporting to server
-- ✅ Maintains single-player mode option
+- ✅ Restart functionality
+- ✅ Game over overlay with results
 
 ## 🛠️ Configuration
 
 ### Backend Settings
 
-`appsettings.json`:
-```json
-{
-  "GameSettings": {
-    "OrdersPerGame": 10,
-    "OrderDurationSeconds": 10,
-    "CountdownDurationSeconds": 10,
-    "ResultsTimeoutSeconds": 30,
-    "RoomInactivityTimeoutMinutes": 5
-  }
-}
-```
+Hardcoded in `RoomService.cs` and `GameEngineService.cs`:
+- Orders per game: 10
+- Order duration: 10 seconds
+- Countdown duration: 6 seconds
+- Results timeout: 30 seconds
+- Room inactivity timeout: 5 minutes
 
 ### Frontend Settings
 
@@ -130,45 +145,64 @@ VITE_BACKEND_URL=http://localhost:5000/gamehub
 
 For production:
 ```
-VITE_BACKEND_URL=https://your-app.azurewebsites.net/gamehub
+VITE_BACKEND_URL=https://ohmyhungrygod-backend.azurewebsites.net/gamehub
 ```
+
+**Required Assets:**
+- `public/assets/images/logo-small.png`
+- `public/assets/images/logo-large.png`
+- `public/assets/videos/endings/neutral_ending.webm`
+- `public/assets/videos/endings/angry_ending.webm`
 
 ### iOS Settings
 
-`SignalRClient.swift`:
+**Backend URL** in `SignalRClient.swift`:
 ```swift
-init(hubUrl: String = "http://localhost:5000/gamehub") {
+init(hubUrl: String = "https://ohmyhungrygod-backend.azurewebsites.net/gamehub")
 ```
+
+**Required Assets:**
+- `Assets.xcassets/Logo.imageset/` - Logo for About screen
+- `Assets.xcassets/ScreenFrame.imageset/` - Leaves border overlay
+- `Sounds/touch.mp3` - Touch sound effect
+- `Sounds/throw.mp3` - Throw sound effect
+- `Sounds/hit.mp3` - Hit sound effect
+- `Sounds/miss.mp3` - Miss sound effect
 
 ## 📝 Implementation Notes
 
 ### What's Complete
 
-✅ Backend: Full implementation, tested and compiles
-✅ Frontend: Full implementation, builds successfully
-✅ iOS: Integration points created, SignalR package integrated
+✅ **Backend**: Full implementation with player names and per-player stats
+✅ **Frontend**: Complete with enhanced UI, particle effects, and team ratings
+✅ **iOS**: Full integration with sounds, visual enhancements, and restart
 
-### iOS SignalR Integration
+### Recent Enhancements (v2)
 
-The iOS app uses `SignalR-Client-Swift` package.
-All the integration points are ready:
-- `GameManager` reports hits to server when in multiplayer mode
-- `LobbyView` handles room joining and ready states
-- `OrderOverlayView` displays current order during gameplay
+**Backend:**
+- Player names required on join
+- Per-player hit tracking and statistics
+- Removed burnout game over (always complete 10 orders)
+- 6-second countdown duration
 
-## 🎨 Assets Needed
+**Frontend:**
+- Logo branding throughout
+- Circular arc countdown timer
+- Particle splash effects on hits
+- Emoji highlight animations
+- Mood-based ending videos
+- Team stars rating system
+- Per-player statistics display
+- Restart functionality
 
-For the web display, add mood videos to `oh-my-hungry-god-display/public/assets/videos/`:
-
-- `neutral.mp4` - Neutral mood (😐)
-- `happy.mp4` - Happy mood (😊)
-- `angry.mp4` - Angry mood (😠)
-- `burned.mp4` - Burned/game over (💀)
-
-Videos should:
-- Be loopable
-- Match the visual style of your game
-- Be optimized for web (H.264, reasonable bitrate)
+**iOS:**
+- How To Play guide on welcome
+- Share host URL button
+- Sound effects system
+- Randomized fruit panel
+- Screen frame overlay
+- About screen
+- Restart option
 
 ## 📚 Documentation
 
