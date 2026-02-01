@@ -6,6 +6,14 @@ A synchronous multiplayer AR game where players work together to feed a hungry g
 
 **Host Display**: https://ggj2026.borissedov.com
 
+## Project Repositories
+
+This game is split across three repositories:
+
+- **[Backend Server](https://github.com/borissedov/GGJ2026-Backend)** - .NET 9 + SignalR authoritative server
+- **[Frontend Display](https://github.com/borissedov/GGJ2026-Frontend)** - TypeScript web app for TV/projector
+- **[iOS AR Controller](https://github.com/borissedov/GGJ2026-iOS)** - Swift + ARKit mobile controllers
+
 ## Game Overview
 
 Feed a hungry god by throwing fruits into their mouth displayed on a TV or projector! Work together with other players to fulfill orders before time runs out. But beware - make too many mistakes and the god will burn out in anger!
@@ -116,14 +124,6 @@ The god's mood is shown on the TV display with animated video loops.
 3. **Don't over-throw**: One extra fruit = instant fail
 4. **Watch the timer**: 10 seconds goes fast!
 5. **Stay calm**: Panic leads to mistakes
-
-## Project Repositories
-
-This game is split across three repositories:
-
-- **[Backend Server](https://github.com/borissedov/GGJ2026-Backend)** - .NET 9 + SignalR authoritative server
-- **[Frontend Display](https://github.com/borissedov/GGJ2026-Frontend)** - TypeScript web app for TV/projector
-- **[iOS AR Controller](https://github.com/borissedov/GGJ2026-iOS)** - Swift + ARKit mobile controllers
 
 ## About
 
