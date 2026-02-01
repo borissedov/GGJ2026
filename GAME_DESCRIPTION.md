@@ -1,39 +1,27 @@
-# Oh My Hungry God 🍉🥥🍑🍌
+# Oh My Hungry God
 
-A synchronous multiplayer AR game where players work together to feed a hungry god by throwing fruits into their mouth!
+A synchronous multiplayer AR game for Global Game Jam 2026.
 
-## Play the Game
+## Concept
 
-**Host Display**: https://ggj2026.borissedov.com
+Feed a hungry god by throwing fruits into their mouth! Work together with other players to fulfill orders before time runs out. But beware - make too many mistakes and the god will burn out in anger!
 
-## Project Components
+## How to Play
 
-This project consists of three main components:
-
-- **[Backend Server](https://github.com/borissedov/GGJ2026-Backend)** - .NET 9 + SignalR authoritative server
-- **[Frontend Display](https://github.com/borissedov/GGJ2026-Frontend)** - TypeScript web app for TV/projector
-- **[iOS AR Controller](https://github.com/borissedov/GGJ2026-iOS)** - Swift + ARKit mobile controllers
-
-## Game Overview
-
-Feed a hungry god by throwing fruits into their mouth displayed on a TV or projector! Work together with other players to fulfill orders before time runs out. But beware - make too many mistakes and the god will burn out in anger!
-
-### How to Play
-
-#### Setup
-1. **Display the game** on a TV or projector at https://ggj2026.borissedov.com
+### Setup
+1. **Display the game** on a TV or projector (web browser)
 2. **Players join** by scanning the QR code with their iOS devices
 3. **Point your phone** at the TV screen to enter AR mode
 4. **Mark ready** when you're set to play
 
-#### Gameplay
+### Gameplay
 - Each round presents an **order** showing which fruits are needed
 - **All players work together** to throw the right fruits
 - Swipe fruits from your phone toward the mask's mouth
 - **10 seconds** to complete each order
 - **10 orders** total per game
 
-#### Winning
+### Winning
 - **Exact match** = Success! The god is pleased
 - **Over-submission** = Instant fail! Too much of a fruit
 - **Timeout** = Fail! Didn't complete in time
@@ -125,14 +113,11 @@ The god's mood is shown on the TV display with animated video loops.
 4. **Watch the timer**: 10 seconds goes fast!
 5. **Stay calm**: Panic leads to mistakes
 
-## About
+## Credits
 
-Created for **Global Game Jam 2026** in Mauritius at **Institut Français de Maurice**.
+Created for Global Game Jam 2026
 
-- **Jam Site**: https://globalgamejam.org/jam-sites/2026/ggj2026-mauritius-institut-francais-de-maurice
-- **Global Game Jam**: https://globalgamejam.org
-
-### Technologies
+Technologies:
 - ARKit (Apple)
 - RealityKit (Physics & 3D)
 - .NET 9 (Backend)
@@ -141,4 +126,4 @@ Created for **Global Game Jam 2026** in Mauritius at **Institut Français de Mau
 
 ---
 
-**Ready to play?** Visit https://ggj2026.borissedov.com and feed the hungry god! 🍉🥥🍑🍌
+**Ready to play?** Scan the QR code and feed the hungry god! 🍉🥥🍑🍌
